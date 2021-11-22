@@ -1,15 +1,27 @@
-require('express').config()
-const dotenv = require('dotenv')
-
-
-
-const PORT = process.env.PORT 
-
+require('dotenv').config()
+require("./database/connection")
+const express = require('express')
 const app = express()
+require('express-async-errors');
+const cookies = require("cookie-parser")
+const PORT = process.env.PORT 
+const router = require('./router/route')
 
-app.get('/', ( req, res)=>{
-    res.send("hello world")
+app.use(express.json())
+
+app.use(cookies())
+app.use(router)
+
+
+
+app.use((error, req, res, next)=>{
+    res.json({success:false, message: error.message
+    })
 })
+
+
+
+
 
 
 app.listen(PORT, ()=>{
