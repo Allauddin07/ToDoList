@@ -1,5 +1,8 @@
 const jwt = require("jsonwebtoken")
 const User = require("../model/userModel")
+
+//logIn checking feature-----
+
 exports.authenticate = async(req, res, next)=>{
 
     const toke = req.cookies.token
@@ -15,6 +18,8 @@ exports.authenticate = async(req, res, next)=>{
     next()
 
 }
+
+//Admin checking role---------
 
 exports.authorized= (...roles)=>{
     return (req, res, next)=>{

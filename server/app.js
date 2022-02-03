@@ -6,11 +6,13 @@ require('express-async-errors');
 const cookies = require("cookie-parser")
 const PORT = process.env.PORT 
 const router = require('./router/route')
+const project = require('./router/projectRouter')
 
 app.use(express.json())
 
 app.use(cookies())
 app.use(router)
+app.use("/project", project )
 
 
 

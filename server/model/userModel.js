@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, "Please enter your name"],
+        trim:true
     },
     email: {
         type: String,
@@ -29,7 +30,11 @@ const userSchema = new mongoose.Schema({
         trim: true,
         select: false,
 
-    }
+    },
+    // timestamps: {
+    //     createdAt: 'created_at',
+    //     updatedAt: 'updated_at'
+    //   }
 
 })
 
