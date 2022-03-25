@@ -3,12 +3,13 @@ const Opt = require('../model/otp')
 const catchError = require("../middleware/catchEroor")
 const bcrypt = require("bcryptjs")
 const sendEmail = require("../middleware/mailer")
+const jwt = require("jsonwebtoken")
 // const cookies = require("cookie-parser")
 
 //Creating user ---Admin Only
 exports.createUser = async (req, res) => {
 
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     const user = await User.findOne({ email })
     if (user) {
@@ -18,8 +19,10 @@ exports.createUser = async (req, res) => {
 
     else {
 
-        const created = await User.create({ name, email, password })
+        const created = await User.create({ name, email, password, role })
+        res.cookie("tokennn", "token hai bhai")
         res.status(200).json({ success: true, message: "User created succefully " })
+        
     }
 
 
@@ -28,6 +31,7 @@ exports.createUser = async (req, res) => {
 // getting all user
 exports.getUser = async (req, res, next) => {
     const user = await User.find()
+    res.cookie("tokennn", "token hai bhai")
     res.status(200).json({
         success: true,
         message: user
@@ -37,6 +41,10 @@ exports.getUser = async (req, res, next) => {
 }
 // Updating user --Amin Only
 exports.updateUser = async (req, res) => {
+
+    console.log(req.params.id)
+    console.log(req.body)
+
     const user = await User.findById(req.params.id)
     if (!user) {
         res.status(501).json({
@@ -45,6 +53,7 @@ exports.updateUser = async (req, res) => {
         })
     }
     else {
+        console.log(req.body)
         const user = await User.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true,
@@ -110,6 +119,8 @@ exports.userDetail = async (req, res) => {
 
 exports.logIn = async (req, res) => {
 
+    console.log(req.body)
+
     const { email, password } = req.body
     if (!email || !password) {
         res.status(501).json({
@@ -122,7 +133,7 @@ exports.logIn = async (req, res) => {
         if (!user) {
             res.status(501).json({
                 success: false,
-                message: "No user found with this Eamil"
+                message: "Invalid logIn"
             })
         }
         else {
@@ -130,18 +141,23 @@ exports.logIn = async (req, res) => {
             if (!match) {
                 res.status(501).json({
                     success: false,
-                    message: "Invalid LogIn"
+                    message: "Invalid logIn"
                 })
             }
             else {
                 const token = await user.generateToken()
                 const option = {
 
-                    httpOnly: true
+                    httpOnly: true,
+                    maxAge: 360000,
+                    sameSite: 'lax'
                 }
+                
                 res.status(200).cookie("token", token, option).json({
                     success: true,
-                    message: "logIn successfully"
+                    token,
+                    message: "logIn successfully",
+                    user
                 })
             }
 
@@ -151,7 +167,6 @@ exports.logIn = async (req, res) => {
 
 
 }
-
 
 //logout feature
 
@@ -168,6 +183,8 @@ exports.logOut = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
 
+    console.log(req.body)
+
     const { email } = req.body
     if (!email) {
         res.status(403).json({
@@ -177,7 +194,7 @@ exports.forgotPassword = async (req, res) => {
     }
     else {
 
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email }).select('+password')
         console.log(user)
         if (!user) {
             res.status(403).json({
@@ -186,27 +203,34 @@ exports.forgotPassword = async (req, res) => {
             })
         }
         else {
-            const opt = Math.floor(Math.random() * 10000 + 1)
+            // const opt = Math.floor(Math.random() * 10000 + 1)
+            let secret = process.env.SECURE;
+            let payload = {
+                id: user._id,
+                email: user.email
 
-            const otp = await Opt.create({
-                email,
-                opt
-            })
+            }
+            let token = jwt.sign(payload, secret, { expiresIn: '15m' })
+            const link = `http://localhost:3001/passwordchange/${user.id}/${token}`
+            console.log(link)
+
+
+
 
             console.log(user.email)
-            const message = `Your code is \n\n ${opt} \n\n if you have not requested this email, just simply gnore it`
+            const message = `Your code is \n\n ${link} \n\n if you have not requested this email, just simply gnore it`
             await sendEmail({
                 email: user.email,
                 subject: "TickTalkweb",
                 message
             })
-            const option = {
-                httpOnly: true
-            }
-            res.cookie("pass", opt, option)
-            res.cookie("email", user.email, option)
+            // const option = {
+            //     httpOnly: true
+            // }
+            // res.cookie("pass", opt, option)
+            // res.cookie("email", user.email, option)
             res.status(200).json({
-                success: false,
+                success: true,
                 message: "Email sent successfully"
             })
         }
@@ -219,69 +243,124 @@ exports.forgotPassword = async (req, res) => {
 
 exports.verifyCode = async (req, res) => {
 
-    const pass = req.cookies.pass
-
-    const { reset } = req.body
-
-
-    if (pass !== reset) {
-        res.status(402).json({
-            successf: false,
-            message: "please Resend thecode"
+    const { id, token } = req.params
+    console.log(id)
+    console.log(token)
+    // console.log(req.body)
+    const user = await User.findById(id).select('+password')
+    if (!user) {
+        res.status(401).json({
+            success: false,
+            message: "No user exits with this id"
         })
+
+
+
     }
     else {
+        let secret = process.env.SECURE + user.password
+        let match = jwt.verify(secret, token)
 
+        if (!match) {
+            res.status(402).json({
+                success: false,
+                message: "Please contact to your Admin"
+            })
+        }
+        else {
 
-        res.status(200).json({
-            successf: true,
-            message: "Good Job Mannnnnn"
-        })
+            res.status(402).json({
+                success: true,
+                message: "You can change your password now"
+            })
+
+            
+        }
     }
 }
 
 //resetCode------------>
 exports.resetPassword = async (req, res) => {
 
-    const { password, confirmpassword } = req.body
-    const email = req.cookies.email
-    if (!password || !confirmpassword) {
-        res.status(402).json({
+    try {
+        const { password, confirmpassword } = req.body
+    let { id, token } = req.params
+    
+    console.log(id)
+    console.log(token)
+    console.log(req.body)
+    const user = await User.findById(id).select('+password')
+    console.log(user)
+    if (!user) {
+        res.status(401).json({
             success: false,
-            message: "please fill all fields"
+            message: "No user exits with this id"
         })
+
+
+
     }
     else {
-        if (password !== confirmpassword) {
+        let secret = process.env.SECURE
+        let match =  jwt.verify(token, secret)
+
+        if (!match) {
             res.status(402).json({
                 success: false,
-                message: "Password is not matching"
+                message: "Please contact to your Admin"
             })
-
         }
         else {
-            const user = await User.findOne({ email })
 
-            user.password = password
-            await user.save()
 
-            res.status(200).json({
-                success: true,
-                message: "Pasword reset successfuly"
-            })
-            
+
+            if (!password || !confirmpassword) {
+                res.status(402).json({
+                    success: false,
+                    message: "please fill all fields"
+                })
+            }
+            else {
+                if (password !== confirmpassword) {
+                    res.status(402).json({
+                        success: false,
+                        message: "Password is not matching"
+                    })
+
+                }
+                else {
+                    // const user = await User.findOne({ email })
+
+                    user.password = password
+                    await user.save()
+
+                    res.status(200).json({
+                        success: true,
+                        message: `Pasword reset successfuly${user}`
+                    })
+
+                }
+
+            }
         }
-
-    }
 
 
 
 
 }
+        
+    } catch (error) {
 
-exports.changeRole = async(req, res)=>{
+        console.log(error)
+        
+    }
+
+    
+}
+
+exports.changeRole = async (req, res) => {
     const user = await User.findById(req.params.id)
-    if(!user){
+    if (!user) {
 
         res.status(402).json({
             success: false,
@@ -289,8 +368,8 @@ exports.changeRole = async(req, res)=>{
         })
 
     }
-    else{
-        user.role=req.body.role
+    else {
+        user.role = req.body.role
         await user.save()
         res.status(200).json({
             success: true,

@@ -1,156 +1,266 @@
-import React, { useState } from 'react'
+import React from 'react'
 import '../Style/App.css'
-import img from '../images/img1.jpg'
-// import { NavDropdown } from 'react-bootstrap';
-// import { useState } from 'react'
-// import {Link} from 'react-router-dom'
-// 
+import Navbar from '../component/Navbar'
+import Sidemenu from './Sidemenu'
+import { Outlet } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+
+
+
+
+
+
+
+
 function Home() {
-    const [state, setstate] = useState(false)
-    const [click, setClick] = useState(false)
-    const [change, setChange] = useState(false)
 
-    const changeClick = (e) => {
-        setstate(!state)
-        setClick(false)
-        setChange(false)
-    }
+    const { user } = useSelector((state) => {
 
-    const lick = (e) => {
-        setClick(!click)
-        setstate(false)
-        setChange(false)
-    }
-    const chang = (e) => {
-        setChange(!change)
-        setClick(false)
-        setstate(false)
-    }
+        return state.auth
+
+    })
+    const user_role = JSON.parse(localStorage.getItem('user'))
+
+    console.log(user_role)
+
+
+
 
 
     return (
         <>
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-md-2  g-0">
-                        <div className="sidebar d-flex flex-column">
-                            <div className="log align-self-center my-5">
-                                <span><i className="fas fa-home"></i></span> TickTalk
+            {user_role.role === "admin" ? <React.Fragment>
+                <div className="sidebar">
+
+
+                    <Sidemenu />
+
+
+                </div>
+                <div className="page-content">
+                    <Navbar />
+
+                    <div className=" mainContaint">
+
+                        <div className='cards p-3 '>
+                            <div className="card-single"><div>
+                                <h1>{user.length}</h1>
+                                <h1>Users</h1>
                             </div>
-                            <div className="side ml-6">
-                                <div className="d-flex justify-content-between">
-                                    <div>
-                                        <span className=""><i className="fas fa-home "></i></span> Dashboard
-                                    </div>
 
-                                    <div onClick={changeClick}>
-                                        {state ?
-                                            <span><i className='fas fa-chevron-down'></i></span> :
-                                            <span><i className='fas fa-chevron-right'></i></span>
-                                        }
-                                    </div>
+                                <div className="align-self-center">
+                                    <i className="fa-solid fa-users icon"></i>
                                 </div>
 
-                                <div className={state ? " mt-3 change" : "changeClick"}>
-
-
-                                <div className=" "><span><i class="far fa-circle"></i></span>
-                                        <a href="#gg">Home</a></div>
-                                    <div className=" "><span><i class="far fa-circle"></i></span>
-                                        <a href="#g">Home</a></div>
-
-                                    <div className=" "><span><i class="far fa-circle"></i></span>
-                                        <a href="#g">Home</a></div>
-
+                            </div>
+                            <div className="card-single">
+                                <div>
+                                    <h1>0</h1>
+                                    <h1>Projects</h1>
+                                </div>
+                                <div className="align-self-center">
+                                    <i className="fa-solid fa-clipboard-list icon"></i>
                                 </div>
 
-
-
-
-
-
-                                <div className="d-flex justify-content-between mt-4">
-                                    <div>
-                                        <span className=""><i className="fas fa-home "></i></span> Apps
-                                    </div>
-
-                                    <div onClick={lick}>
-                                        {click ?
-                                            <span><i className='fas fa-chevron-down'></i></span> :
-                                            <span><i className='fas fa-chevron-right'></i></span>
-                                        }
-                                    </div>
+                            </div>
+                            <div className="card-single"><div>
+                                <h1>0</h1>
+                                <h1>Tasks</h1>
+                            </div>
+                                <div className="align-self-center">
+                                    <i className="fa-solid fa-clipboard-list icon"></i>
                                 </div>
-
-                                <div className={click ? " change mt-3 " : "changeClick"}>
-                                    <div className="d-flex  "><span><i class="far fa-circle"></i></span>
-                                        <a href="#gg">Home</a></div>
-                                    <div className="d-flex  "><span><i class="far fa-circle"></i></span>
-                                        <a href="#g">Home</a></div>
-
-                                    <div className="d-flex  "><span><i class="far fa-circle"></i></span>
-                                        <a href="#g">Home</a></div>
-
-                                </div>
-
-
-
-                                <div className="d-flex justify-content-between mt-4">
-                                    <div>
-                                        <span className=""><i className="fas fa-home "></i></span> Authentication
-                                    </div>
-
-                                    <div onClick={chang}>
-                                        {change ?
-                                            <span><i className='fas fa-chevron-down'></i></span> :
-                                            <span><i className='fas fa-chevron-right'></i></span>
-                                        }
-                                    </div>
-                                </div>
-
-                                <div className={change ? " change mt-3 " : "changeClick"}>
-                                    <div className="d-flex ml-4"><span><i class="far fa-circle"></i></span>
-                                        <a href="#gg">Users</a></div>
-                                    <div className="d-flex ml-4"><span><i class="far fa-circle"></i></span>
-                                        <a href="#g">Admin</a></div>
-
-                                    <div className=" d-flex ml-4 "><span><i class="far fa-circle"></i></span>
-                                        <a href="#g"></a></div>
-
-                                </div>
-
-
-
-
-
 
                             </div>
                         </div>
+
+
+                        <div className="container">
+
+
+                            <Outlet />
+
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     </div>
-                    <div className="col-md-10 gx-0">
-                        <div className="header d-flex justify-content-between">
-                            <div className=" d-flex logo ">
-                                <i className="fas fa-bars py-5 mx-3"></i>
-                                <button className="btn btn-info align-self-center"><i className="fas fa-plus"></i> <span className="display-1.3">New Task</span> </button>
+                </div>
+            </React.Fragment> : <div>
+                <div className="sidebar">
+
+
+                    <Sidemenu />
+
+
+                </div>
+                <div className="page-content">
+                    <Navbar />
+
+                    <div className=" mainContaint">
+
+                        {/* <div className='cards p-3 '>
+                            <div className="card-single"><div>
+                                <h1>{user.length}</h1>
+                                <h1>Users</h1>
                             </div>
 
-                            <div className=" d-flex right ">
-                                <span className="align-self-center"><i className="fas fa-search py-3 mx-3 "></i></span>
-                                <span className="align-self-center mx-4"><i className="fas fa-bell py-3 mx-3 "></i></span>
-
-                                <div className="d-flex  align-items-center mr-1">
-                                    <span>Allauddin</span>
-                                    <img className="img-thumbnail thumb-xs mx-2 " src={img} alt="tasvir" />
+                                <div className="align-self-center">
+                                    <i className="fa-solid fa-users icon"></i>
                                 </div>
+
                             </div>
+                            <div className="card-single">
+                                <div>
+                                    <h1>0</h1>
+                                    <h1>Projects</h1>
+                                </div>
+                                <div className="align-self-center">
+                                    <i className="fa-solid fa-clipboard-list icon"></i>
+                                </div>
+
+                            </div>
+                            <div className="card-single"><div>
+                                <h1>0</h1>
+                                <h1>Tasks</h1>
+                            </div>
+                                <div className="align-self-center">
+                                    <i className="fa-solid fa-clipboard-list icon"></i>
+                                </div>
+
+                            </div>
+                        </div> */}
+
+
+                        <div className="container">
+
+
+                            <Outlet />
 
                         </div>
-                        <div className="row mainContaint">
 
-                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     </div>
                 </div>
             </div>
+
+
+
+
+
+
+
+
+
+            }
+
+
+            {/* <div className="sidebar">
+
+                        
+                        <Sidemenu/>
+
+                        
+                    </div>
+                    <div className="page-content">
+                        <Navbar />
+
+                        <div className=" mainContaint">
+
+                            <div className='cards p-3 '>
+                                <div className="card-single"><div>
+                                    <h1>{user.length}</h1>
+                                    <h1>Users</h1>
+                                </div>
+
+                                <div className="align-self-center">
+                                <i className="fa-solid fa-users icon"></i>
+                                </div>
+                                
+                                </div>
+                                <div className="card-single">
+                                    <div>
+                                    <h1>0</h1>
+                                    <h1>Projects</h1>
+                                </div>
+                                <div className="align-self-center">
+                                <i className="fa-solid fa-clipboard-list icon"></i>
+                                </div>
+                               
+                                </div>
+                                <div className="card-single"><div>
+                                    <h1>0</h1>
+                                    <h1>Tasks</h1>
+                                </div>
+                                <div className="align-self-center">
+                                <i className="fa-solid fa-clipboard-list icon"></i>
+                                </div>
+                                
+                                </div>
+                            </div>
+
+
+                          <div className="container">
+
+                          
+                          <Outlet/>
+
+                          </div>
+
+                            
+
+
+
+
+
+
+
+                            
+
+
+
+
+
+
+
+
+
+                        </div>
+                    </div> */}
+
 
 
 

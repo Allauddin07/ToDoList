@@ -14,11 +14,11 @@ const router = require('express').Router()
 router.route('/create').post(createUser)
 
 //Get User
-router.route('/getuser').get(authenticate, getUser)
+router.route('/getuser').get( getUser)
 
 // Update User by Amdin
 
-router.route('/user/:id').put(authenticate, updateUser).delete(authenticate, authorized("admin"), deleteUser).get(authenticate, userDetail)
+router.route('/user/:id').put( updateUser).delete(  deleteUser).get(userDetail)
 
 // login for all
 
@@ -33,11 +33,11 @@ router.route("/forgotPassword").post(forgotPassword)
 
 // verifyCode  --->
 
-router.route("/verifycode").post(verifyCode)
+router.route("/reset-password/:id/:token").get(verifyCode)
 
 //Resetting password
 
-router.route("/resetpassword").put(resetPassword)
+router.route("/reset-password/:id/:token").post(resetPassword)
 
 router.route('/changerole/:id').put(changeRole)
 

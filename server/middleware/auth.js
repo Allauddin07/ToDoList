@@ -6,6 +6,7 @@ const User = require("../model/userModel")
 exports.authenticate = async(req, res, next)=>{
 
     const toke = req.cookies.token
+    console.log(toke)
     if (!toke){
         return res.status(402).json({
             success:false,
