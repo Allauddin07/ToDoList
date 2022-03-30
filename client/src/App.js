@@ -47,13 +47,13 @@ function App() {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(getuser())
-        dispatch(getProject())
+        // dispatch(getuser())
+        // dispatch(getProject())
 
         dispatch(add_token())
 
 
-    }, [])
+    }, [ dispatch])
 
 
     return (

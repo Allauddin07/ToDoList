@@ -5,7 +5,9 @@ const User = require("../model/userModel")
 
 exports.authenticate = async(req, res, next)=>{
 
-    const toke = req.cookies.token
+    try {
+        console.log("token")
+        const toke = req.cookies.token
     console.log(toke)
     if (!toke){
         return res.status(402).json({
@@ -17,6 +19,16 @@ exports.authenticate = async(req, res, next)=>{
     req.user = await User.findOne({_id:jt.id})
     console.log(req.user)
     next()
+        
+    } catch (error) {
+        res.status(402).json({
+            success:false,
+            message:"Something went wrong"
+        })
+        
+    }
+
+    
 
 }
 

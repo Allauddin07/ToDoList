@@ -63,28 +63,12 @@ const User = () => {
 
 
     const deleteUser = async (id) => {
-
-
         const val = await display(id)
-
-
-
-
         if (val === true) {
 
             dispatch(dell(id))
             dispatch(getuser())
-
-
-
         }
-
-
-
-
-
-
-
 
     }
 

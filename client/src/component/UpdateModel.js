@@ -5,32 +5,29 @@ import {
 }
     from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { getuser, model } from '../Reducer/Authreducer';
-import { toast } from 'react-toastify';
+
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createProject, getProject } from '../Reducer/Projectreducer';
+import { getProject, model, updateProject } from '../Reducer/Projectreducer';
 import { useEffect } from 'react';
 import MyVerticallydModal from './logSpiner';
 
 
 
-function ProjectModel(props) {
+function UpdateModel(props) {
 
-
-
-    const [state, setState] = useState({
-        name: '',
-        description: ''
-
-    })
-
-    const { error, msg, loading, success } = useSelector((state) => {
+    const { error, msg, pro, loading, success } = useSelector((state) => {
 
         return state.project
 
     })
 
+    const [state, setState] = useState({
 
+
+    })
+
+    
 
 
     const notify = (mg) => toast.success(mg, {
@@ -65,67 +62,42 @@ function ProjectModel(props) {
 
 
     const hide = () => {
-
-
-
-
-        props.onHide()
-        setState({
-            name: '',
-            email: '',
-            password: '',
-            role: 'user'
-        })
         dispatch(model())
-
-
+        props.onHide()
     }
-
 
 
 
 
     const createU = async () => {
 
-        dispatch(createProject(state))
+        dispatch(updateProject(state))
 
 
     }
+    console.log(state)
 
     useEffect(() => {
 
+        if (pro) {
+            setState({ ...pro })
+        }
         if (msg) {
-
-            dispatch(getuser())
-            setState({
-                name: '',
-                description: '',
-
-            })
+            notify(msg)
+            dispatch(model())
+            getProject()
             props.onHide()
-            dispatch(getProject())
-            // notify(msg)
-            dispatch(model())
-
         }
-        if(error){
-            noti(error)
-            dispatch(model())
-            
-        }
-
-        
-
-
-
-    }, [msg, notify, noti, dispatch, setState, error, props])
-
-
+       
+    }, [pro, msg, error])
 
 
     return (
 
         <>
+
+
+
 
 
 
@@ -137,13 +109,7 @@ function ProjectModel(props) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Create User
-
-                        
-                        {/* {st.msg && <div className="alert alert-danger mb-4 text-center " role="alert">
-                            <h4>{msg}</h4>
-                        </div>} */}
-
+                        Update User
                         {loading &&
 
                             <MyVerticallydModal
@@ -151,8 +117,10 @@ function ProjectModel(props) {
 
                             />
 
-
                         }
+
+                        {error && <ToastContainer position="top-center"
+                            autoClose={5000} />}
 
                     </Modal.Title>
                 </Modal.Header>
@@ -183,44 +151,6 @@ function ProjectModel(props) {
 
                         </div>
 
-
-                        {/* <div className='d-flex mb-5 mt-3'>
-
-                            <div className='align-self-center '>
-                                <i className="fa-solid fa-envelope"></i>
-                            </div>
-                            <div className="form-group  flex-grow-1">
-                                <input type="password" name="password" Value={state.password} onChange={handleChange} />
-                                <label >Password </label>
-                            </div>
-
-                        </div> */}
-
-
-
-
-
-
-                        {/* <div className='d-flex mb-4'>
-                            <div className='align-self-center '>
-                                <i className="fa-solid fa-lock"></i>
-                            </div>
-                            <div className="form-group  flex-grow-1">
-
-
-                                <select Value={state.role}
-                                    name="role" onChange={handleChange}>
-                                    <option > user</option>
-                                    <option >admin </option>
-                                </select>
-
-                            </div>
-
-                        </div> */}
-
-
-
-
                     </div>
 
                 </Modal.Body>
@@ -229,7 +159,7 @@ function ProjectModel(props) {
                     <Button variant="primary" onClick={() => {
 
                         createU()
-                        
+
                     }}>
                         Create
                     </Button>
@@ -239,5 +169,5 @@ function ProjectModel(props) {
     );
 }
 
-export default ProjectModel
+export default UpdateModel
 

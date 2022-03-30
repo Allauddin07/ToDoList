@@ -9,7 +9,7 @@ const Router = express.Router()
 
 //---------> Create Project Only By Admin-------->
 
-Router.route("/createP").post(authenticate, createProject)
+Router.route("/createP").post( authenticate, createProject)
 
 
 Router.route("/getAllProject").get(getAllProjects)

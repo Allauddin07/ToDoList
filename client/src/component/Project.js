@@ -1,13 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Modal } from 'react-bootstrap';
 
 import '../Style/App.css'
 import ProjectModel from './ProjectModel';
-import { ToastContainer } from 'react-toastify';
+import UpdateModel from './UpdateModel';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { model } from '../Reducer/Authreducer';
 import { useState } from 'react';
+import { deleteProject, getProject, singleProject } from '../Reducer/Projectreducer';
+import { confirm } from 'react-bootstrap-confirmation';
+
+
 
 
 
@@ -15,15 +20,65 @@ import { useState } from 'react';
 
 const Project = () => {
 
-    const { project } = useSelector((state) => {
+    const { project, msg, error } = useSelector((state) => {
 
         return state.project
 
     })
+
+
+
     const [modalShow, setModalShow] = useState(false);
+    const [modaShow, setModaShow] = useState(false);
 
     const dispatch = useDispatch()
+    const options = {
+        title: 'Delete',
+        okText: 'Yes',
+        cancelText: 'No'
 
+
+    }
+
+    const updateP = (id) => {
+        // console.log(id)
+        dispatch(singleProject(id))
+
+    }
+    const display = (id) => {
+        const usr =project.find((usr)=>{
+            return (usr._id===id)
+        })
+        console.log(usr)
+        const result = confirm(`Are you sure? you want to delete ${usr.name}`, options);
+        return result
+
+    };
+
+
+    const delProject = async (id) => {
+        const val = await display(id)
+        if (val === true) {
+            dispatch(deleteProject(id))
+            
+        }
+
+    }
+    const notify = (mg) => toast.success(mg, {
+        position: "top-center",
+        autoClose: 5000
+    });
+
+// useEffect(()=>{
+
+//     if (msg){
+
+//         notify(msg)
+// dispatch(getProject())
+
+//     }
+
+// },[msg])
 
 
 
@@ -31,14 +86,20 @@ const Project = () => {
         <>
 
             <ProjectModel
+                show={modaShow}
+                onHide={() => setModaShow(false)}
+                onShow={() => setModaShow(true)}
+            />
+
+            <UpdateModel
                 show={modalShow}
                 onHide={() => setModalShow(false)}
-                onShow={() => setModalShow(true)}
+                onShow={() => setModalShow(true)
+                }
             />
 
             <ToastContainer position="top-center"
                 autoClose={5000} />
-
 
 
 
@@ -83,9 +144,9 @@ const Project = () => {
 
                                         <button className="btn btn-info align-self-center" onClick={
                                             () => {
-                                            setModalShow(true)
-                                            dispatch(model())
-                                        }
+                                                setModaShow(true)
+                                                dispatch(model())
+                                            }
                                         } >
                                             <i className="fas fa-plus"></i> <span className="display-1.3">New project</span> </button>
                                     </div>
@@ -122,10 +183,19 @@ const Project = () => {
                                                                 <td>{item.description}</td>
                                                                 <td>something</td>
                                                                 <td>going</td>
-                                                                <td><Button  > Delete
+                                                                <td><Button onClick={()=>{
+
+                                                                    delProject(item._id)
+                                                                    
+                                                                }}  > Delete
 
                                                                 </Button>
-                                                                    <Button variant="primary" >
+                                                                    <Button variant="primary" onClick={
+                                                                        () => {
+                                                                            updateP(item._id)
+                                                                            setModalShow(true)
+                                                                        }
+                                                                    } >
                                                                         update
                                                                     </Button>
                                                                     <i className="fa-solid fa-pencil"></i></td>

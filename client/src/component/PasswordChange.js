@@ -88,7 +88,7 @@ let {id, token} =useParams()
 
     useEffect(()=>{
         if(msg){
-            notify()
+            notify(msg)
         }
         
     },[msg])
